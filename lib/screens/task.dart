@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:trackme/core/constants.dart';
 import 'package:trackme/core/theme.dart';
+import 'package:trackme/core/utils.dart';
 import 'package:trackme/models/entities.dart';
 import 'package:trackme/providers/database.dart';
 import 'package:trackme/widgets/bars.dart';
@@ -59,7 +60,13 @@ class _InitState extends State<TaskScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Paragraph.normal(_tasks[index].title),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Paragraph.normal(_tasks[index].title),
+                            Paragraph.subtitle('${_tasks[index].project.name} (${formatDate(_tasks[index].created)})'),
+                          ],
+                        ),
                         ActionButton(
                             icon: const FaIcon(FontAwesomeIcons.trash),
                             onTap: () async {

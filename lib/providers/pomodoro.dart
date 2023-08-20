@@ -6,8 +6,9 @@ import 'package:trackme/providers/database.dart';
 typedef OnTimerTick = void Function(int counter, int total, String state);
 
 class PomodoroTimer {
-  static final PomodoroTimer _instance = PomodoroTimer();
+  static final PomodoroTimer _instance = PomodoroTimer._();
   static PomodoroTimer get instance => _instance;
+  PomodoroTimer._();
   static const int _seconds = 60;
 
   static const int _focusTime = 20 * _seconds;
@@ -28,8 +29,10 @@ class PomodoroTimer {
   Timer? _timer;
   OnTimerTick? onTimerTick;
 
+  List<(String, int)> get cycles => _cycles;
+
   Future<bool> load() async {
-    var current = await DatabaseProvider.instance.getPomodoro();
+    var current = await nextCycle();
     if (current == null) return false;
 
     var now = DateTime.now();
@@ -83,6 +86,7 @@ class PomodoroTimer {
   }
 
   _startCycle(int cycle, int counter) {
+    _timer?.cancel();
     if (cycle >= _cycles.length) {
       cycle = 0;
     }
@@ -91,7 +95,6 @@ class PomodoroTimer {
       counter++;
       onTimerTick!(counter, description.$2, description.$1);
       if (counter >= description.$2) {
-        timer.cancel();
         _startCycle(cycle+1, 0);
       }
     });
@@ -105,11 +108,28 @@ class PomodoroTimer {
     var current = await DatabaseProvider.instance.getPomodoro();
     if (current == null) return null;
 
-    var cycle = _cycles[current.cycle + 1];
+    var now = DateTime.now();
+    if (current.end.isAfter(now)) {
+      return current;
+    }
 
-    current.init = current.end;
-    current.end = current.init.add(Duration(seconds: cycle.$2));
-    current.cycle = current.cycle + 1;
+    var next = current.cycle;
+    var init = now;
+    var end = current.end;
+    while (!end.isAfter(now)) {
+      next++;
+      if (next >= _cycles.length) {
+        next = 0;
+      }
+      init = end;
+      end = end.add(Duration(seconds: _cycles[next].$2));
+    }
+
+    var cycle = _cycles[next];
+
+    current.init = init;
+    current.end = end;
+    current.cycle = next;
     current.cycleName = cycle.$1;
 
     await DatabaseProvider.instance.updatePomodoro(current);

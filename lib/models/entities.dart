@@ -5,27 +5,125 @@ import 'package:trackme/models/abstracts.dart';
 const projectType = 1;
 const taskType = 2;
 
-class Habit {
+class MoneyTrack implements DataSerial {
   int id;
-  String title;
-  String subtitle;
-  int count;
-  int min;
-  int max;
+  String label;
+  DateTime created;
+  double? debit;
+  double? credit;
+
+  static const String createSQL = 'CREATE TABLE moneyTrack(id INTEGER PRIMARY KEY AUTOINCREMENT,'
+      'label TEXT NOT NULL, created TEXT NOT NULL, debit REAL NULL, credit REAL NULL)';
+  static const String dropSql = 'DROP TABLE moneyTrack';
+
+  MoneyTrack({
+    required this.id,
+    required this.label,
+    required this.created,
+    this.debit,
+    this.credit,
+  });
+
+  @override
+  int tableId() {
+    return id;
+  }
+
+  @override
+  String tableName() {
+    return 'moneyTrack';
+  }
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'label': label,
+      'created': created.toString(),
+      'debit': debit,
+      'credit': credit,
+    };
+  }
+
+  factory MoneyTrack.fromMap(Map<String, dynamic> map) {
+    return MoneyTrack(
+      id: map['id'],
+      label: map['label'],
+      created: DateTime.parse(map['created']),
+      debit: map['debit'],
+      credit: map['credit'],
+    );
+  }
+
+  factory MoneyTrack.empty() {
+    return MoneyTrack(id: 0, label: '', created: DateTime.now());
+  }
+}
+
+class Habit implements DataSerial {
+  int id;
+  String name;
+  int limit;
   int icon;
+  String unitTimes;
 
   Habit({
     required this.id,
-    required this.title,
-    required this.count,
-    required this.max,
+    required this.name,
     required this.icon,
-    this.subtitle = '',
-    this.min = 0,
+    required this.limit,
+    this.unitTimes = '',
   });
 
   IconData iconData() {
     return IconDataSolid(icon);
+  }
+
+  @override
+  int tableId() {
+    return id;
+  }
+
+  @override
+  String tableName() {
+    return 'habit';
+  }
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'limit': limit,
+      'icon': icon,
+      'unitTimes': unitTimes,
+    };
+  }
+}
+
+class HabitTrack implements DataSerial {
+  int id;
+  late Habit habit;
+
+  HabitTrack({
+    required this.id,
+  });
+
+  @override
+  int tableId() {
+    return id;
+  }
+
+  @override
+  String tableName() {
+    return 'habitTrack';
+  }
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+
+    };
   }
 }
 
@@ -34,6 +132,7 @@ class Project implements DataSerial {
   String name;
 
   static const String createSQL = 'CREATE TABLE project(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL)';
+  static const String dropSql = 'DROP TABLE project';
 
   Project({
     required this.id,
@@ -73,6 +172,9 @@ class Project implements DataSerial {
     );
   }
 
+  factory Project.empty() {
+    return Project(id: 0, name: '');
+  }
 }
 
 class Task implements DataSerial {
@@ -90,6 +192,7 @@ class Task implements DataSerial {
   static const int failed = 3;
 
   static const String createSQL = 'CREATE TABLE task(id INTEGER PRIMARY KEY, title TEXT NOT NULL, projectId INTEGER NOT NULL, created TEXT NOT NULL, due TEXT NULL, finished TEXT NULL, status INT NOT NULL);';
+  static const String dropSql = 'DROP TABLE task';
 
   Task({
     required this.id,
@@ -112,10 +215,12 @@ class Task implements DataSerial {
       status: map['status'],
     );
 
-    instance.project = Project(
-      id: instance.projectId,
-      name: map['projectName']
-    );
+    if (map['projectName'] != null) {
+      instance.project = Project(
+          id: instance.projectId,
+          name: map['projectName']
+      );
+    }
 
     return instance;
   }
@@ -150,6 +255,10 @@ class Task implements DataSerial {
       'status': status,
     };
   }
+
+  factory Task.empty() {
+    return Task(id: 0, title: '', projectId: 0, created: DateTime.now());
+  }
 }
 
 class TimeTrack implements DataSerial {
@@ -161,6 +270,7 @@ class TimeTrack implements DataSerial {
   late Project project;
 
   static const String createSQL = 'CREATE TABLE timeTrack(id INTEGER PRIMARY KEY, projectId INTEGER NOT NULL, taskId INTEGER NULL, created TEXT NOT NULL, minutes INT NOT NULL);';
+  static const String dropSql = 'DROP TABLE timeTrack';
 
   TimeTrack({
     required this.id,
@@ -207,6 +317,10 @@ class TimeTrack implements DataSerial {
   String tableName() {
     return 'timeTrack';
   }
+
+  factory TimeTrack.empty() {
+    return TimeTrack(id: 0, projectId: 0, created: DateTime.now(), minutes: 0);
+  }
 }
 
 class Pomodoro {
@@ -219,6 +333,7 @@ class Pomodoro {
   DateTime created;
 
   static const String createSQL = 'CREATE TABLE pomodoro(init TEXT, end TEXT, cycle int, cycleName TEXT, nodeId INT, nodeType INT, created TEXT)';
+  static const String dropSql = 'DROP TABLE pomodoro';
 
   Pomodoro({
     required this.init,

@@ -68,8 +68,8 @@ class _HomeState extends State<HomeScreen> {
           ),
           HabitContainer(
               items: [
-                Habit(id: 0, title: 'Caminar', count: 3000, min: 0, max: 9000, icon: FontAwesomeIcons.personWalking.codePoint, subtitle: 'pasos'),
-                Habit(id: 1, title: 'Regar plantas', count: 0, min: 0, max: 1, icon: FontAwesomeIcons.houseFloodWater.codePoint),
+                Habit(id: 0, name: 'Caminar', limit: 9000, icon: FontAwesomeIcons.personWalking.codePoint, unitTimes: 'pasos'),
+                Habit(id: 1, name: 'Regar plantas', limit: 1, icon: FontAwesomeIcons.houseFloodWater.codePoint),
               ],
               onViewAll: () {}
           ),

@@ -20,6 +20,9 @@ void callbackDispatcher() {
       case pomodoroStart:
         await BackgroundService.instance.pomodoroStartHandler(true);
         break;
+      case notificationShow:
+        await BackgroundService.instance.showNotification(inputData ?? {});
+        break;
     }
     return true;
   });

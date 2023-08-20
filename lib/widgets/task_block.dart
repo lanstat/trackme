@@ -37,7 +37,7 @@ class _InitState extends State<TaskBlock> {
   }
 
   void _refreshList() {
-    DatabaseProvider.instance.listTasks(limit: 5, showFinished: false).then((value) {
+    DatabaseProvider.instance.listTasksToDo(date: DateTime.now()).then((value) {
       setState(() {
         _items = value;
       });
@@ -193,7 +193,7 @@ class _InitState extends State<TaskBlock> {
   }
 
   void _passTask(Task record) {
-    record.created = record.created.add(const Duration(days: 1));
+    record.created = DateTime.now().add(const Duration(days: 1));
     DatabaseProvider.instance.update(record);
   }
 }

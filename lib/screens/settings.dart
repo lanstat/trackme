@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+//import 'package:share_plus/share_plus.dart';
 import 'package:trackme/core/constants.dart';
 import 'package:trackme/core/theme.dart';
+import 'package:trackme/providers/database.dart';
+import 'package:trackme/providers/filesystem.dart';
 import 'package:trackme/screens/project.dart';
 import 'package:trackme/widgets/bars.dart';
 import 'package:trackme/widgets/boxes.dart';
@@ -54,21 +57,22 @@ class _InitState extends State<SettingScreen> {
                   ListTile(
                     leading: const FaIcon(FontAwesomeIcons.fileExport),
                     title: Paragraph.normal('Exportar base de datos'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ProjectScreen()),
-                      );
+                    onTap: () async {
+                      await DatabaseProvider.instance.export();
+                      /*
+                      final result = await Share.shareXFiles([XFile(dbExport.path)]);
+
+                      if (result.status == ShareResultStatus.success) {
+                        _showSnackBar('Importacion compartida');
+                      }
+                      */
                     },
                   ),
                   ListTile(
                     leading: const FaIcon(FontAwesomeIcons.fileImport),
                     title: Paragraph.normal('Importar base de datos'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ProjectScreen()),
-                      );
+                    onTap: () async {
+                      await DatabaseProvider.instance.import();
                     },
                   ),
                 ],
@@ -77,5 +81,10 @@ class _InitState extends State<SettingScreen> {
           ],
         ),
     );
+  }
+
+  _showSnackBar(String message) {
+    var snackBar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

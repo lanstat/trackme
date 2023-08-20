@@ -131,9 +131,9 @@ class HabitContainer extends StatelessWidget {
         child: Row(
           children: [
             SleekCircularSlider(
-              min: item.min.toDouble(),
-              max: item.max.toDouble(),
-              initialValue: item.count.toDouble(),
+              min: 0,
+              max: item.limit.toDouble(),
+              initialValue: 0,
               appearance: CircularSliderAppearance(
                 size: 40,
                 customColors: CustomSliderColors(
@@ -153,8 +153,8 @@ class HabitContainer extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Paragraph.normal(item.title),
-                Paragraph.subtitle('${item.count}/${item.max} ${item.subtitle.toUpperCase()}')
+                Paragraph.normal(item.name),
+                Paragraph.subtitle('0/${item.limit} ${item.unitTimes.toUpperCase()}')
               ],
             ),
           ],

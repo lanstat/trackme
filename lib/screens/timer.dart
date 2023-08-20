@@ -173,6 +173,7 @@ class _InitState extends State<TimerScreen> with WidgetsBindingObserver {
   Future _toggleTimer() async {
     if (_timerIsActive) {
       await PomodoroTimer.instance.stop();
+      await BackgroundService.instance.stop(ServiceType.pomodoro);
       _refreshTimeTracks();
       setState(() {
         _timerIsActive = !_timerIsActive;

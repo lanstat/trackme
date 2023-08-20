@@ -10,18 +10,33 @@ class NotificationProvider {
   final _flutterLocal = FlutterLocalNotificationsPlugin();
   var _hasPermission = false;
 
-  Future<void> show(String title, String body) async {
-    const androidNotification = AndroidNotificationDetails(
+  Future<int> show(String title, String body, {
+    int id = 0,
+    bool playSound = false,
+    int progress = 0,
+    int maxProgress = 0,
+    bool showProgress = false,
+  }) async {
+    var androidNotification = AndroidNotificationDetails(
       'trackme',
       'Track me',
       channelDescription: 'Track me channel',
       importance: Importance.defaultImportance,
       priority: Priority.high,
-      icon: '@mipmap/ic_launcher'
+      icon: '@mipmap/ic_launcher',
+      playSound: playSound,
+
+      progress: progress,
+      maxProgress: maxProgress,
+      showProgress: showProgress,
     );
-    const notificationDetails = NotificationDetails(android: androidNotification);
-    _id++;
-    await _flutterLocal.show(_id, title, body, notificationDetails);
+    var notificationDetails = NotificationDetails(android: androidNotification);
+    if (id == 0) {
+      _id++;
+      id = _id;
+    }
+    await _flutterLocal.show(id, title, body, notificationDetails);
+    return id;
   }
 
   Future<void> requestPermissions() async {
